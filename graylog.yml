@@ -20,7 +20,7 @@ services:
       - plugins.security.ssl.http.enabled=false
       - plugins.security.disabled=true      
       - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${MONGO_ADMIN_PASSWORD}
     ulimits:
       memlock:
         soft: -1
@@ -45,7 +45,7 @@ services:
       - plugins.security.ssl.http.enabled=false
       - plugins.security.disabled=true      
       - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${MONGO_ADMIN_PASSWORD}
     ulimits:
       memlock:
         soft: -1
