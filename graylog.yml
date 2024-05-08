@@ -1,0 +1,89 @@
+version: '3.8'
+services:
+  mongodb:
+    hostname: "mongodb"  
+    image: mongo:6.0.15   
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+      
+  opensearch-node1:
+    hostname: opensearch-node1
+    image: opensearchproject/opensearch:2
+    environment:
+      - action.auto_create_index=false
+      - bootstrap.memory_lock=true
+      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2
+      - cluster.name=opensearch-cluster
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2      
+      - node.name=opensearch-node1 
+      - plugins.security.ssl.http.enabled=false
+      - plugins.security.disabled=true      
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=t$f*#72@TRnsyW#%B7n5WTfrs"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 262144
+        hard: 262144
+    restart: unless-stopped        
+    volumes:
+      - opensearch_data1:/usr/share/opensearch/data
+
+  opensearch-node2:
+    image: opensearchproject/opensearch:2
+    hostname: opensearch-node2
+    environment:
+      - action.auto_create_index=false
+      - bootstrap.memory_lock=true
+      - cluster.initial_cluster_manager_nodes=opensearch-node1,opensearch-node2
+      - cluster.name=opensearch-cluster
+      - discovery.seed_hosts=opensearch-node1,opensearch-node2      
+      - node.name=opensearch-node2
+      - plugins.security.ssl.http.enabled=false
+      - plugins.security.disabled=true      
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=t$f*#72@TRnsyW#%B7n5WTfrs"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 262144
+        hard: 262144
+    restart: unless-stopped        
+    volumes:
+      - opensearch_data2:/usr/share/opensearch/data
+  graylog:
+    hostname: "server"
+    image: "graylog/graylog:6.0"
+    depends_on:
+      - mongodb
+      - opensearch-node1
+      - opensearch-node2
+    environment:
+      - GRAYLOG_ELASTICSEARCH_HOSTS=http://opensearch-node1:9200,http://opensearch-node2:9200
+      - GRAYLOG_MONGODB_URI=mongodb://mongodb:27017/graylog
+      - GRAYLOG_REPORT_DISABLE_SANDBOX=true
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://0.0.0.0:9000/
+      - GRAYLOG_PASSWORD_SECRET=<secret>
+      - GRAYLOG_ROOT_PASSWORD_SHA2=<sha2-secret>
+    ports:
+      - "9000:9000/tcp"
+      - "5044:5044/tcp"
+      - "5140:5140/tcp"
+      - "5140:5140/udp"
+      - "12201:12201/tcp"
+      - "12201:12201/udp"
+      - "13301:13301/tcp"
+      - "13302:13302/tcp"      
+    restart: unless-stopped
+networks:
+  log:
+    driver: "bridge"
+volumes:
+  mongo_data:
+  opensearch_data1:
+  opensearch_data2:
