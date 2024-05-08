@@ -20,7 +20,7 @@ services:
       - plugins.security.ssl.http.enabled=false
       - plugins.security.disabled=true      
       - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
-      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=t$f*#72@TRnsyW#%B7n5WTfrs"
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${ADMIN_PASSWORD}
     ulimits:
       memlock:
         soft: -1
@@ -45,7 +45,7 @@ services:
       - plugins.security.ssl.http.enabled=false
       - plugins.security.disabled=true      
       - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
-      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=t$f*#72@TRnsyW#%B7n5WTfrs"
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${ADMIN_PASSWORD}
     ulimits:
       memlock:
         soft: -1
@@ -68,8 +68,8 @@ services:
       - GRAYLOG_MONGODB_URI=mongodb://mongodb:27017/graylog
       - GRAYLOG_REPORT_DISABLE_SANDBOX=true
       - GRAYLOG_HTTP_EXTERNAL_URI=http://0.0.0.0:9000/
-      - GRAYLOG_PASSWORD_SECRET=<secret>
-      - GRAYLOG_ROOT_PASSWORD_SHA2=<sha2-secret>
+      - GRAYLOG_PASSWORD_SECRET=${GRAYLOG_PASSWORD_SECRET}
+      - GRAYLOG_ROOT_PASSWORD_SHA2=${GRAYLOG_ROOT_PASSWORD_SHA2}
     ports:
       - "9000:9000/tcp"
       - "5044:5044/tcp"
@@ -80,10 +80,14 @@ services:
       - "13301:13301/tcp"
       - "13302:13302/tcp"      
     restart: unless-stopped
+    volumes:
+        - graylog_data:/usr/share/graylog/data
+        
 networks:
   log:
     driver: "bridge"
 volumes:
   mongo_data:
+  graylog_data:
   opensearch_data1:
   opensearch_data2:
